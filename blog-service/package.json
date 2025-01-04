@@ -2,12 +2,13 @@
     "name": "blog-service",
     "version": "1.0.0",
     "description": "Blog service for the multi-service blog platform",
-    "main": "dist/app",
+    "main": "dist/app.js",
     "type": "module",
     "scripts": {
         "build": "tsc",
-        "start": "node dist/app.js",
-        "dev": "node --loader ts-node/esm src/app.ts",
+        "start": "node --loader ts-node/esm src/app.ts",
+        "dev": "nodemon --watch \"src/**/*.ts\" --exec \"node --loader ts-node/esm\" src/app.ts",
+        "watch": "tsc -w",
         "type-check": "tsc --noEmit"
     },
     "dependencies": {

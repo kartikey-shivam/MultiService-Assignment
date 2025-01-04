@@ -1,5 +1,6 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
 
 interface UserRequestBody {
   username: string;
@@ -7,62 +8,115 @@ interface UserRequestBody {
   password: string;
 }
 
-// Register User
- const registerUser = async (req: Request<{}, {}, UserRequestBody>, res: Response): Promise<void> => {
-  try {
-    const { username, email, password } = req.body;
-    const user = await User.create(username, email, password);
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+class UserController {
+  // Register User
+  public static async register(
+    req: Request<{}, {}, UserRequestBody>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { username, email, password } = req.body;
+      const user = await User.create(username, email, password);
+      const token = jwt.sign(
+        { userId: user.id },
+        process.env.JWT_SECRET as string,
+        { expiresIn: '24h' }
+      );
+      
+      res.status(201).json({
+        status: 'success',
+        data: {
+          token,
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email
+          }
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-};
 
-// Login User
- const loginUser = async (req: Request<{}, {}, UserRequestBody>, res: Response): Promise<void> => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findByEmail(email);
-    if (!user) throw new Error('User not found');
-    const isMatch = await User.comparePassword(password, user.password);
-    if (!isMatch) throw new Error('Invalid credentials');
-    res.json({ id: user.id, email: user.email });
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+  // Login User
+  public static async login(
+    req: Request<{}, {}, UserRequestBody>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { email, password } = req.body;
+      const user = await User.findByEmail(email);
+      if (!user) throw new Error('User not found');
+
+      const isMatch = await User.comparePassword(password, user.password);
+      if (!isMatch) throw new Error('Invalid credentials');
+
+      const token = jwt.sign(
+        { userId: user.id },
+        process.env.JWT_SECRET as string,
+        { expiresIn: '24h' }
+      );
+
+      res.json({
+        status: 'success',
+        data: {
+          token,
+          user: {
+            email: user.email
+          }
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-};
-
-// Get User
- const getUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) throw new Error('User not found');
-    res.json(user);
-  } catch (error) {
-    res.status(404).json({ error: (error as Error).message });
+  // Get User
+  public static async getById(
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) throw new Error('User not found');
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
   }
-};
 
-// Update User
- const updateUser = async (req: Request<{ id: string }, {}, UserRequestBody>, res: Response): Promise<void> => {
-  try {
-    const { username, email } = req.body;
-    const user = await User.update(req.params.id, username, email);
-    if (!user) throw new Error('User not found');
-    res.json(user);
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+  // Update User
+  public static async update(
+    req: Request<{ id: string }, {}, UserRequestBody>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { username, email } = req.body;
+      const user = await User.update(req.params.id, username, email);
+      if (!user) throw new Error('User not found');
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
   }
-};
 
-// Delete User
- const deleteUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-  try {
-    await User.delete(req.params.id);
-    res.json({ message: 'User deleted successfully' });
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+  // Delete User
+  public static async delete(
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      await User.delete(req.params.id);
+      res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+      next(error);
+    }
   }
-};
+}
 
-export { registerUser, loginUser, getUser, updateUser, deleteUser };
+export default UserController;

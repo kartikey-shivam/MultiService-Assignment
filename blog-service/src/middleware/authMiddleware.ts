@@ -15,7 +15,7 @@ export const authenticate = (
   next: NextFunction
 ): void => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
-
+  console.log(token,"18")
   if (!token) {
     res.status(401).json({ error: 'Access denied. No token provided.' });
     return;
