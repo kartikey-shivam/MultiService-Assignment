@@ -1,0 +1,46 @@
+# Dependencies
+**/node_modules/
+**/package-lock.json
+**/yarn.lock
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+**/.env.development
+**/.env.test
+**/.env.production
+
+# Build outputs
+**/dist/
+**/build/
+**/out/
+
+# Logs
+**/logs
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Service specific
+user-service/node_modules/
+blog-service/node_modules/
+comment-service/node_modules/
+
+user-service/.env
+blog-service/.env
+comment-service/.env
+
+# TypeScript
+**/*.tsbuildinfo

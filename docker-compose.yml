@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  user-service:
+    build: ./user-service
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env.local
+    networks:
+      - blog-network
+
+  blog-service:
+    build: ./blog-service
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env.local
+    networks:
+      - blog-network
+
+  comment-service:
+    build: ./comment-service
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env.local
+    networks:
+      - blog-network
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: blogdb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - blog-network
+
+volumes:
+  postgres-data:
+
+networks:
+  blog-network:
+    driver: bridge
