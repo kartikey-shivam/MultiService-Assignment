@@ -35,7 +35,7 @@ interface UserRequestBody {
 // Get User
  const getUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
   try {
-    const user = await User.findById(parseInt(req.params.id));
+    const user = await User.findById(req.params.id);
     if (!user) throw new Error('User not found');
     res.json(user);
   } catch (error) {
@@ -47,7 +47,7 @@ interface UserRequestBody {
  const updateUser = async (req: Request<{ id: string }, {}, UserRequestBody>, res: Response): Promise<void> => {
   try {
     const { username, email } = req.body;
-    const user = await User.update(parseInt(req.params.id), username, email);
+    const user = await User.update(req.params.id, username, email);
     if (!user) throw new Error('User not found');
     res.json(user);
   } catch (error) {
@@ -58,7 +58,7 @@ interface UserRequestBody {
 // Delete User
  const deleteUser = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
   try {
-    await User.delete(parseInt(req.params.id));
+    await User.delete(req.params.id);
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(400).json({ error: (error as Error).message });
