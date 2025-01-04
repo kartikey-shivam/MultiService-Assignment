@@ -15,7 +15,7 @@ export const authenticate = (
   next: NextFunction
 ): void => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
-  
+
   if (!token) {
     res.status(401).json({ error: 'Access denied. No token provided.' });
     return;
@@ -26,6 +26,6 @@ export const authenticate = (
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    res.status(400).json({ error: 'Invalid token.' });
+    res.status(401).json({ error: 'Invalid token.' });
   }
 };

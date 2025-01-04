@@ -1,0 +1,188 @@
+{
+  "info": {
+    "name": "Multi-Service Blog Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API collection for Blog Platform microservices",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "url": "{{USER_SERVICE_URL}}/api/users/register",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"SecurePass123!\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "code": 201,
+              "body": {
+                "id": 1,
+                "username": "testuser",
+                "email": "test@example.com"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "url": "{{USER_SERVICE_URL}}/api/users/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"SecurePass123!\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "code": 200,
+              "body": {
+                "token": "jwt_token_here",
+                "user": {
+                  "id": 1,
+                  "email": "test@example.com"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Blog Service",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{BLOG_SERVICE_URL}}/api/health"
+          }
+        },
+        {
+          "name": "Create Blog",
+          "request": {
+            "method": "POST",
+            "url": "{{BLOG_SERVICE_URL}}/api/blogs",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Test Blog\",\n    \"content\": \"This is a test blog post\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Blogs",
+          "request": {
+            "method": "GET",
+            "url": "{{BLOG_SERVICE_URL}}/api/blogs",
+            "query": [
+              {
+                "key": "page",
+                "value": "1"
+              },
+              {
+                "key": "limit",
+                "value": "10"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Blog by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{BLOG_SERVICE_URL}}/api/blogs/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comment Service",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{COMMENT_SERVICE_URL}}/api/health"
+          }
+        },
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "url": "{{COMMENT_SERVICE_URL}}/api/comments",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"Test comment\",\n    \"postId\": \"1\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Comments by Post ID",
+          "request": {
+            "method": "GET",
+            "url": "{{COMMENT_SERVICE_URL}}/api/comments?postId=1"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "USER_SERVICE_URL",
+      "value": "http://localhost:3001"
+    },
+    {
+      "key": "BLOG_SERVICE_URL",
+      "value": "http://localhost:3002"
+    },
+    {
+      "key": "COMMENT_SERVICE_URL",
+      "value": "http://localhost:3003"
+    },
+    {
+      "key": "access_token",
+      "value": "your_jwt_token_here"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import client from '../config/database.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 interface User {
   id: number;

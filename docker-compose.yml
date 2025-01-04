@@ -1,45 +1,88 @@
 version: '3.8'
+
 services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: blogDB
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   user-service:
-    build: ./user-service
+    build: 
+      context: ./user-service
+      dockerfile: Dockerfile
+    platform: linux/amd64
     ports:
       - "3001:3001"
-    env_file:
-      - .env.local
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=blogDB
+      - PORT=3001
+      - NODE_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - blog-network
 
   blog-service:
-    build: ./blog-service
+    build: 
+      context: ./blog-service
+      dockerfile: Dockerfile
+    platform: linux/amd64
     ports:
       - "3002:3002"
-    env_file:
-      - .env.local
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=blogDB
+      - PORT=3002
+      - NODE_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - blog-network
 
   comment-service:
-    build: ./comment-service
-    ports:
-      - "3003:3003"
-    env_file:
-      - .env.local
-    networks:
-      - blog-network
-
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: blogdb
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - blog-network
+      build: 
+        context: ./comment-service
+        dockerfile: Dockerfile
+      platform: linux/amd64
+      ports:
+        - "3003:3003"
+      environment:
+        - DB_HOST=postgres
+        - DB_USER=postgres
+        - DB_PASSWORD=postgres
+        - DB_NAME=blogDB
+        - PORT=3003
+        - NODE_ENV=production
+      depends_on:
+        postgres:
+          condition: service_healthy
+      networks:
+        - blog-network
 
 volumes:
-  postgres-data:
+  postgres_data:
+    name: blog-platform-postgres-data
 
 networks:
   blog-network:

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import commentRoutes from './routes/commentRoutes.js';
 import client from './config/database.js';
+import { authenticate } from './middleware/authMiddleware.js';
 
 dotenv.config();
 
@@ -28,7 +29,8 @@ app.get('/api/health', async (req: Request, res: Response) => {
   }
 });
 
-app.use('/api/comments', commentRoutes);
+// Protected comment routes
+app.use('/api/comments', authenticate, commentRoutes);
 
 const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {

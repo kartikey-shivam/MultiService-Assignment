@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import blogRoutes from './routes/blogRoutes.js';
 import client from './config/database.js';
+import { authenticate } from './middleware/authMiddleware.js';
 
 dotenv.config();
 
@@ -30,8 +31,8 @@ app.get('/api/health', async (req: Request, res: Response) => {
   }
 });
 
-// Blog routes
-app.use('/api/blogs', blogRoutes);
+// Protected blog routes
+app.use('/api/blogs', authenticate, blogRoutes);
 
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
